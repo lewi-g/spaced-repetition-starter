@@ -3,6 +3,12 @@ const express = require('express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const BearerStrategy = require('passport-http-bearer').Strategy;
+const Mongoose = require('mongoose');
+
+
+const { User } = require('./models.js');
+const { PORT, DATABASE_URL } = require('./config.js');
+
 
 let secret = {
   CLIENT_ID: process.env.CLIENT_ID,
