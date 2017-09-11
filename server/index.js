@@ -37,6 +37,16 @@ passport.use(
     // google id, and the access token
     // Job 2: Update this callback to either update or create the user
     // so it contains the correct access token
+    // if access token = refresh token then continue progress
+    // if access token !== refresh token then create a new user 
+    // accessToken given by Google
+    // look into database and find a matching google ID -- have we seen them before
+
+    // 1. find google ID
+    // 2. console.log to see if they exist
+    // 2a. Should start with saying THEY DONT EXIST
+    // 3. IF THEY DONT EXIST -- CREATE THEM
+    
     const user = database[accessToken] = {
       googleId: profile.id,
       accessToken: accessToken

@@ -5,14 +5,14 @@
 const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
-  googleID: {type: String, required: true},
+  googleId: {type: String, required: true},
   accessToken: {type: String, required: true},
 });
 
 userSchema.methods.apiRepr = function() {
   return {
     _id: this._id,
-    googleID: this.googleID,
+    googleId: this.googleId, //may need profile.id
     // definition: this.defintion
   };
 }; 
