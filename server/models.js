@@ -18,6 +18,6 @@ userSchema.methods.apiRepr = function() {
 }; 
 
 
-const User = mongoose.model('Note', userSchema);
+const User = mongoose.model('User', userSchema);
 
-module.exports = {User};
+module.exports = User;

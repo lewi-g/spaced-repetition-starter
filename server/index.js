@@ -7,7 +7,7 @@ const BearerStrategy = require('passport-http-bearer').Strategy;
 const mongoose = require('mongoose');
 
 
-const { User } = require('./models.js');
+const  User = require('./models.js');
 const { PORT, DATABASE_URL } = require('./config.js');
 
 
@@ -34,12 +34,14 @@ passport.use(
     callbackURL: '/api/auth/google/callback'
   },
   (accessToken, refreshToken, profile, cb) => {
-		console.log(accessToken,'refreshToken', refreshToken, 'profile', profile);
+		// console.log(accessToken,'refreshToken', refreshToken, 'profile', profile)
 		User.create({
 			googleId: profile.id,
 			accessToken: accessToken
-		})
-		console.log('profile', profile.id)
+		}, (err, user) => {
+      return cb(err, user);
+    })
+		// console.log('profile', profile.id)
     // Job 1: Set up Mongo/Mongoose, create a User model which store the
     // google id, and the access token
     // Job 2: Update this callback to either update or create the user
@@ -119,14 +121,29 @@ app.get(/^(?!\/api(\/|$))/, (req, res) => {
 });
 
 let server;
-function runServer(databaseUrl=DATABASE_URL, port=3001) {
+// function runServer() {
+//     let databaseUri = 'mongodb:/space_dev:1@ds133094.mlab.com:33094/google_auth';
+//     mongoose.Promise = global.Promise;
+//     mongoose.connect(databaseUri).then(function() {
+//      app.listen(3001, HOST, (err) => {
+
+//         if (err) {
+//             console.error(err);
+//             return(err);
+//         }
+//         const host = HOST || 'localhost';
+//         console.log(`Listening on ${host}:3001`);
+//     });
+//  });
+// }
+function runServer(databaseUrl='mongodb://space_dev:1@ds133094.mlab.com:33094/google_auth', port=3001) {
   return new Promise((resolve, reject) => {
     mongoose.connect(databaseUrl, err => {
       if (err) {
         return reject(err);
       }
     });
-    server = app.listen(port, () => {
+    server = app.listen(port, 'localhost',() => {
       resolve();
     }).on('error', reject);
   });
@@ -142,6 +159,7 @@ function closeServer() {
     });
   });
 }
+
 
 if (require.main === module) {
   runServer();
