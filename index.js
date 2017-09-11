@@ -1,12 +1,15 @@
+'use strict';
 const express = require('express');
 const proxy = require('http-proxy-middleware');
 
 const app = express();
 const runServer = require('./server').runServer;
+const { PORT, DATABASE_URL } = require('./server/config.js');
+
 
 if (process.env.NODE_ENV === 'production') {
   // Just run the server
-  runServer(process.env.PORT || 8080);
+  runServer(DATABASE_URL, process.env.PORT || 8080);
 }
 else {
   const app = express();

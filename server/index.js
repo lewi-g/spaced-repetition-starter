@@ -1,9 +1,10 @@
+'use strict';
 const path = require('path');
 const express = require('express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const BearerStrategy = require('passport-http-bearer').Strategy;
-const Mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 
 const { User } = require('./models.js');
@@ -33,6 +34,12 @@ passport.use(
     callbackURL: '/api/auth/google/callback'
   },
   (accessToken, refreshToken, profile, cb) => {
+		console.log(accessToken,'refreshToken', refreshToken, 'profile', profile);
+		User.create({
+			googleId: profile.id,
+			accessToken: accessToken
+		})
+		console.log('profile', profile.id)
     // Job 1: Set up Mongo/Mongoose, create a User model which store the
     // google id, and the access token
     // Job 2: Update this callback to either update or create the user
@@ -46,7 +53,7 @@ passport.use(
     // 2. console.log to see if they exist
     // 2a. Should start with saying THEY DONT EXIST
     // 3. IF THEY DONT EXIST -- CREATE THEM
-    
+    //Users.findOne
     const user = database[accessToken] = {
       googleId: profile.id,
       accessToken: accessToken
@@ -112,8 +119,13 @@ app.get(/^(?!\/api(\/|$))/, (req, res) => {
 });
 
 let server;
-function runServer(port=3001) {
+function runServer(databaseUrl=DATABASE_URL, port=3001) {
   return new Promise((resolve, reject) => {
+    mongoose.connect(databaseUrl, err => {
+      if (err) {
+        return reject(err);
+      }
+    });
     server = app.listen(port, () => {
       resolve();
     }).on('error', reject);

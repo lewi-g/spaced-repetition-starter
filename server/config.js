@@ -1,4 +1,4 @@
-use strict';
+'use strict';
 
 require('dotenv').config(); // converts .env file into an object: process.env
 
@@ -13,5 +13,4 @@ exports.PORT = process.env.PORT || 3001;
 
 // console.log('mLab', exports.DATABASE_URL);
 
-//equire('dotenv').config({path: __dirname + '/.env'})
-// mongodump -h ds135912.mlab.com:35912 -d notehero -u 'dev' -p '1' -o ~/
+
