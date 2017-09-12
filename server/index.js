@@ -60,7 +60,7 @@ passport.use(
       .exec()
       .then(_user => {
         console.log('look here: ', _user);
-      //  user = _user;
+        //  user = _user;
         if (!_user) {
           User.create({
             googleId: profile.id,
@@ -92,9 +92,7 @@ passport.use(
       //find user with matching access token -- If you find them use next Line -- database[token] = user
 
       return done(null, database[token]);
-    }
-    return done(null, database[token]);
-  })
+    })
 );
 
 // user provide access token -- header with a Bearer token (password)
@@ -153,9 +151,9 @@ app.get('/api/auth/logout', (req, res) => {
   res.redirect('/');
 });
 
-app.get('/qustions')
+app.get('/qustions');
 
-app.post('/questionsadd')
+app.post('/questionsadd');
 app.get('/api/me',
   passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token -- GET & POST
   (req, res) => res.json({                              //Get can pull LOTS of questions and run the algorithms, push large group to backen
