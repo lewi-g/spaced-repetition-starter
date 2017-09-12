@@ -20,8 +20,6 @@ if (process.env.NODE_ENV != 'production') {
 
 const app = express();
 
-// const database = {};
-
 app.use(passport.initialize());
 
 passport.use(
@@ -31,37 +29,10 @@ passport.use(
     callbackURL: '/api/auth/google/callback'
   },
   (accessToken, refreshToken, profile, cb) => {
-    // console.log(accessToken,'refreshToken', refreshToken, 'profile', profile)
-
-    // console.log('profile', profile.id)
-    // Job 1: Set up Mongo/Mongoose, create a User model which store the
-    // google id, and the access token
-    // Job 2: Update this callback to either update or create the user
-    // so it contains the correct access token
-    // if access token = refresh token then continue progress
-    // if access token !== refresh token then create a new user 
-    // accessToken given by Google
-    // look into database and find a matching google ID -- have we seen them before
-
-
-    // 2. console.log to see if they exist
-    // 2a. Should start with saying THEY DONT EXIST
-    // 3. IF THEY DONT EXIST -- CREATE THEM
-    //Users.findOne
-
-    // let user = database[accessToken] = {
-    //   googleId: profile.id,
-    //   accessToken: accessToken
-    // };
-
-
-    // [User.findOne]==========================================
-
     User.findOne({ googleId: profile.id })
       .exec()
       .then(_user => {
         console.log('look here: ', _user);
-        //  user = _user;
         if (!_user) {
           User.create({
             googleId: profile.id,
@@ -79,57 +50,15 @@ passport.use(
 passport.use(
   new BearerStrategy(
     (accessToken, done) => {
-      // Job 3: Update this callback to try to find a user with a
-      // matching access token.  If they exist, let em in, if not,
-      // don't
       User.findOne({ accessToken }, function (err, user) {
         if (err) { return done(err); }
         if (!(user)) {
-          //find user with matching access token -- If you dont find them use next Line
           return done(null, false);
         }
-        //find user with matching access token -- If you find them use next Line -- database[token] = user
         return done(null, user);
       });
     })
 );
-
-
-
-// user provide access token -- header with a Bearer token (password)
-// token needs to match for access
-
-// app.get('/api/auth/google', (req, res) => {
-//   User
-//     .find()
-//     .then(Users => {
-//       // console.log(Users);
-//       res.status(200).json(Users); //Note is equal to the mongoose model being called in
-//     })
-//     .catch(err => {
-//       // console.log('testing');
-//       res.status(500).json({ message: 'Internal error from GET' });
-//     });
-// });
-
-
-// app.get('/api/auth/google/callback', (req, res) => {
-//   //console.log('get all is happening');
-//   User
-//     .findById()
-//     .then(Users => {
-//       // console.log(Notes);
-//       res.status(200).json(Users);
-//     })
-//     .catch(err => {
-//       // console.log('testing');
-//       res.status(500).json({ message: 'Internal error from GET' });
-//     });
-// });
-
-
-
-
 
 app.get('/api/auth/google',
   passport.authenticate('google', { scope: ['profile'] }));
@@ -168,28 +97,6 @@ app.get('/api/questions',
 );
 
 // //---POST---[ADDING USER]---
-// //TODO: I need to complete this post section 
-// //FIXME: this is not done yet 
-
-
-
-// app.post('/api/notes', (req, res) => { //this is the pose when we are clicking on the notes
-//   console.log(req.body, 'requesting body');
-//   Note
-//     .create({
-//       word: req.body.newNote.word,
-//       definition: req.body.newNote.definition
-//     })
-//     .then(
-//     note => {
-//       res.status(201).json(note);
-//     })
-//     .catch(err => {
-//       console.log(err);
-//       res.status(500).json({ message: 'Internal server error' });
-//     });
-
-
 
 app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false }),
   (req, res) => res.json(['firstName', 'email']));
@@ -202,19 +109,11 @@ app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false })
 
 
 //   //---PUT---[USER]---
-//   //TODO: This is where I need to edit the PUT secitons 
-//   //FIXME: this is not done yet 
-//   app.put('/', passport.authenticate('bearer', { sesison: false }),
-//     (req, res) => res.json(['firstName', 'email']));
 
 //   //---PUT---[QUESTIONS]---
 
 
 //   //---DELETE---[REMOVE USER]---
-//   //TODO: This is where I need to have the delete section 
-//   //FIXME: this is not done yet 
-//   app.delete('', passport.authenticate('bearer', { sesison: false }),
-//     (req, res) => res.json(['firstName', 'email']));
 
 //   //---DELETE---[REMOVE ACCESSTOKEN/REFRESHTOKEN]---
 
@@ -233,21 +132,6 @@ app.get(/^(?!\/api(\/|$))/, (req, res) => {
 });
 
 let server;
-// function runServer() {
-//     let databaseUri = 'mongodb:/space_dev:1@ds133094.mlab.com:33094/google_auth';
-//     mongoose.Promise = global.Promise;
-//     mongoose.connect(databaseUri).then(function() {
-//      app.listen(3001, HOST, (err) => {
-
-//         if (err) {
-//             console.error(err);
-//             return(err);
-//         }
-//         const host = HOST || 'localhost';
-//         console.log(`Listening on ${host}:3001`);
-//     });
-//  });
-// }
 function runServer(databaseUrl = 'mongodb://space_dev:1@ds133094.mlab.com:33094/google_auth', port = 3001) {
   return new Promise((resolve, reject) => {
     mongoose.connect(databaseUrl, err => {
