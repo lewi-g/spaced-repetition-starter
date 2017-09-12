@@ -20,7 +20,7 @@ if (process.env.NODE_ENV != 'production') {
 
 const app = express();
 
-const database = {};
+// const database = {};
 
 app.use(passport.initialize());
 
@@ -43,18 +43,19 @@ passport.use(
     // accessToken given by Google
     // look into database and find a matching google ID -- have we seen them before
 
-    
+
     // 2. console.log to see if they exist
     // 2a. Should start with saying THEY DONT EXIST
     // 3. IF THEY DONT EXIST -- CREATE THEM
     //Users.findOne
-    let user = database[accessToken] = {
-      googleId: profile.id,
-      accessToken: accessToken
-    };
+
+    // let user = database[accessToken] = {
+    //   googleId: profile.id,
+    //   accessToken: accessToken
+    // };
 
 
-      // [User.findOne]==========================================
+    // [User.findOne]==========================================
 
     User.findOne({ googleId: profile.id })
       .exec()
@@ -65,35 +66,35 @@ passport.use(
           User.create({
             googleId: profile.id,
             accessToken: accessToken
-          }, (err, user) => {
-            return cb(err, user);
+          }, (err, _user) => {
+            return cb(err, _user);
           });
           return cb(null, false, { message: 'User already exists' });
         }
+        return cb(null, _user);
       });
-    return cb(null, user);
   }
   ));
 
 passport.use(
   new BearerStrategy(
-    (token, done) => {
+    (accessToken, done) => {
       // Job 3: Update this callback to try to find a user with a
       // matching access token.  If they exist, let em in, if not,
-      // don't.
-
-
-
-
-      if (!(token in database)) {
-        //find user with matching access token -- If you dont find them use next Line
-        return done(null, false);
-      }
-      //find user with matching access token -- If you find them use next Line -- database[token] = user
-
-      return done(null, database[token]);
+      // don't
+      User.findOne({ accessToken }, function (err, user) {
+        if (err) { return done(err); }
+        if (!(user)) {
+          //find user with matching access token -- If you dont find them use next Line
+          return done(null, false);
+        }
+        //find user with matching access token -- If you find them use next Line -- database[token] = user
+        return done(null, user);
+      });
     })
 );
+
+
 
 // user provide access token -- header with a Bearer token (password)
 // token needs to match for access
