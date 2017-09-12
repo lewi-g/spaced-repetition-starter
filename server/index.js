@@ -60,7 +60,27 @@ passport.use(
       googleId: profile.id,
       accessToken: accessToken
     };
-    return cb(null, user);
+
+
+      // [User.findOne]==========================================
+
+    User.findOne({ googleId: profile.id })
+      .exec()
+      .then(_user => {
+        user = _user;
+        if (!user) {
+          return callback(null, false, { message: 'Incorrect Google ID' });
+        }
+        return user.validatePassword(password);
+      })
+      .then(isValid => {
+        if (!isValid) {
+          return cb(null, false, { message: 'Incorrect password' });
+        } else {
+          return cb(null, user);
+        }
+      });
+
   }
   ));
 
@@ -77,6 +97,40 @@ passport.use(
     }
   )
 );
+
+
+
+app.get('/api/notes/', (req, res) => {
+  Note
+    .find()
+    .then(Notes => {
+      // console.log(Notes);
+      res.status(200).json(Notes); //Note is equal to the mongoose model being called in
+    })
+    .catch(err => {
+      // console.log('testing');
+      res.status(500).json({ message: 'Internal error from GET' });
+    });
+});
+
+
+app.get('/api/notes/:id', (req, res) => {
+  //console.log('get all is happening');
+  Note
+    .findById()
+    .then(Notes => {
+      // console.log(Notes);
+      res.status(200).json(Notes);
+    })
+    .catch(err => {
+      // console.log('testing');
+      res.status(500).json({ message: 'Internal error from GET' });
+    });
+});
+
+
+
+
 
 app.get('/api/auth/google',
   passport.authenticate('google', {scope: ['profile']}));
@@ -109,6 +163,61 @@ app.get('/api/questions',
   passport.authenticate('bearer', {session: false}),
   (req, res) => res.json(['Question 1', 'Question 2'])
 );
+
+//---POST---[ADDING USER]---
+//TODO: I need to complete this post section 
+//FIXME: this is not done yet 
+
+
+
+app.post('/api/notes', (req, res) => { //this is the pose when we are clicking on the notes
+  console.log(req.body, 'requesting body');
+  Note
+    .create({
+      word: req.body.newNote.word,
+      definition: req.body.newNote.definition
+    })
+    .then(
+      note => {
+        res.status(201).json(note);
+      })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({message: 'Internal server error'});
+    });
+
+
+
+app.post ('/api/auth/google', passport.authenticate('bearer', {sesison:false}),
+(req, res) => res.json(['firstName', 'email']));
+
+//---POST---[ACTION]---
+
+
+//---POST---[ACTION]---
+
+
+
+//---PUT---[USER]---
+//TODO: This is where I need to edit the PUT secitons 
+//FIXME: this is not done yet 
+app.put ('/', passport.authenticate('bearer', {sesison:false}),
+(req, res) => res.json(['firstName', 'email']));
+
+//---PUT---[QUESTIONS]---
+
+
+//---DELETE---[REMOVE USER]---
+//TODO: This is where I need to have the delete section 
+//FIXME: this is not done yet 
+app.delete ('', passport.authenticate('bearer', {sesison:false}),
+(req, res) => res.json(['firstName', 'email']));
+
+//---DELETE---[REMOVE ACCESSTOKEN/REFRESHTOKEN]---
+
+
+
+
 
 // Serve the built client
 app.use(express.static(path.resolve(__dirname, '../client/build')));
