@@ -39,6 +39,7 @@ export default class QuestionPage extends React.Component {
       <div>
         <section className='test'>
           <div className='prompt'>
+            <p> Questions go here</p>
             <ul className='question-list'>{questions}</ul>
           </div>
           <Response />
