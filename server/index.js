@@ -7,6 +7,7 @@ const BearerStrategy = require('passport-http-bearer').Strategy;
 const mongoose = require('mongoose');
 
 const User = require('./models.js');
+const Prompts = require('./models.js');
 const { PORT, DATABASE_URL } = require('./config.js');
 
 let secret = {
@@ -20,8 +21,6 @@ if (process.env.NODE_ENV != 'production') {
 
 const app = express();
 
-// const database = {};
-
 app.use(passport.initialize());
 
 passport.use(
@@ -31,37 +30,10 @@ passport.use(
     callbackURL: '/api/auth/google/callback'
   },
   (accessToken, refreshToken, profile, cb) => {
-    // console.log(accessToken,'refreshToken', refreshToken, 'profile', profile)
-
-    // console.log('profile', profile.id)
-    // Job 1: Set up Mongo/Mongoose, create a User model which store the
-    // google id, and the access token
-    // Job 2: Update this callback to either update or create the user
-    // so it contains the correct access token
-    // if access token = refresh token then continue progress
-    // if access token !== refresh token then create a new user 
-    // accessToken given by Google
-    // look into database and find a matching google ID -- have we seen them before
-
-
-    // 2. console.log to see if they exist
-    // 2a. Should start with saying THEY DONT EXIST
-    // 3. IF THEY DONT EXIST -- CREATE THEM
-    //Users.findOne
-
-    // let user = database[accessToken] = {
-    //   googleId: profile.id,
-    //   accessToken: accessToken
-    // };
-
-
-    // [User.findOne]==========================================
-
     User.findOne({ googleId: profile.id })
       .exec()
       .then(_user => {
         console.log('look here: ', _user);
-        //  user = _user;
         if (!_user) {
           User.create({
             googleId: profile.id,
@@ -79,57 +51,15 @@ passport.use(
 passport.use(
   new BearerStrategy(
     (accessToken, done) => {
-      // Job 3: Update this callback to try to find a user with a
-      // matching access token.  If they exist, let em in, if not,
-      // don't
       User.findOne({ accessToken }, function (err, user) {
         if (err) { return done(err); }
         if (!(user)) {
-          //find user with matching access token -- If you dont find them use next Line
           return done(null, false);
         }
-        //find user with matching access token -- If you find them use next Line -- database[token] = user
         return done(null, user);
       });
     })
 );
-
-
-
-// user provide access token -- header with a Bearer token (password)
-// token needs to match for access
-
-// app.get('/api/auth/google', (req, res) => {
-//   User
-//     .find()
-//     .then(Users => {
-//       // console.log(Users);
-//       res.status(200).json(Users); //Note is equal to the mongoose model being called in
-//     })
-//     .catch(err => {
-//       // console.log('testing');
-//       res.status(500).json({ message: 'Internal error from GET' });
-//     });
-// });
-
-
-// app.get('/api/auth/google/callback', (req, res) => {
-//   //console.log('get all is happening');
-//   User
-//     .findById()
-//     .then(Users => {
-//       // console.log(Notes);
-//       res.status(200).json(Users);
-//     })
-//     .catch(err => {
-//       // console.log('testing');
-//       res.status(500).json({ message: 'Internal error from GET' });
-//     });
-// });
-
-
-
-
 
 app.get('/api/auth/google',
   passport.authenticate('google', { scope: ['profile'] }));
@@ -152,8 +82,6 @@ app.get('/api/auth/logout', (req, res) => {
   res.redirect('/');
 });
 
-app.get('/qustions');
-
 app.post('/questionsadd');
 app.get('/api/me',
   passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token -- GET & POST
@@ -161,34 +89,22 @@ app.get('/api/me',
     googleId: req.user.googleId                         //OR
   })                                                    // Get will pull one question at at time (easier) / have algorithm on the back
 );
+
 //algorithm would live in .GET
 app.get('/api/questions',
   passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token 
-  (req, res) => res.json(['Question 1', 'Question 2'])
-);
-
-// //---POST---[ADDING USER]---
-// //TODO: I need to complete this post section 
-// //FIXME: this is not done yet 
-
-
-
-// app.post('/api/notes', (req, res) => { //this is the pose when we are clicking on the notes
-//   console.log(req.body, 'requesting body');
-//   Note
-//     .create({
-//       word: req.body.newNote.word,
-//       definition: req.body.newNote.definition
-//     })
-//     .then(
-//     note => {
-//       res.status(201).json(note);
-//     })
-//     .catch(err => {
-//       console.log(err);
-//       res.status(500).json({ message: 'Internal server error' });
-//     });
-
+  (req, res) => {
+    Prompts
+      .find()
+      .exec()
+      .then(prompt =>{
+        res.json(prompt);
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json({ error: 'something went terribly wrong' });
+      });
+  });
 
 
 app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false }),
@@ -219,9 +135,6 @@ app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false })
 //   //---DELETE---[REMOVE ACCESSTOKEN/REFRESHTOKEN]---
 
 
-
-
-
 // Serve the built client
 app.use(express.static(path.resolve(__dirname, '../client/build')));
 
@@ -238,7 +151,6 @@ let server;
 //     mongoose.Promise = global.Promise;
 //     mongoose.connect(databaseUri).then(function() {
 //      app.listen(3001, HOST, (err) => {
-
 //         if (err) {
 //             console.error(err);
 //             return(err);
