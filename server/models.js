@@ -32,3 +32,13 @@ const User = mongoose.model('User', userSchema);
 const Prompts = mongoose.model('Prompts', promptSchema);
 
 module.exports = {User, Prompts};
+
+//create a question model
+
+//get an endpoint to return the first question
+
+//get database pulling info
+
+//get displaying in frontend
+
+//Lewi is getting the components together -- Header / login button / whats is our app about 
