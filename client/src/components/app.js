@@ -24,7 +24,7 @@ class App extends React.Component {
 						headers: {
 							'Authorization': `Bearer ${accessToken}`
 						}
-				}).then(res => {
+					}).then(res => {
 					if (!res.ok) {
 						if (res.status === 401) {
 							// Unauthorized, clear the cookie and go to
@@ -33,7 +33,7 @@ class App extends React.Component {
 							return;
 						}
 						throw new Error(res.statusText);
-				}
+					}
 					return res.json();
 			}).then(currentUser =>
 					this.setState({

@@ -63,8 +63,7 @@ passport.use(
 app.get('/api/auth/google',
   passport.authenticate('google', { scope: ['profile'] }));
 
-app.get(
-  '/api/auth/google/callback',
+app.get('/api/auth/google/callback',
   passport.authenticate('google', {
     failureRedirect: '/',
     session: false
@@ -77,7 +76,7 @@ app.get(
 
 app.get('/api/auth/logout', (req, res) => {
   req.logout();
-  res.clearCookie('accessToken');
+  res.clearCookie('accessToken');    //add an anchor tag for this URL or event listener one a button
   res.redirect('/');
 });
 
@@ -107,8 +106,10 @@ app.get('/api/questions',
       });
   });
 
+// //---POST---[ADDING USER]---
 
-app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false }),
+app.post('/api/auth/google', 
+passport.authenticate('bearer', { sesison: false }),
   (req, res) => res.json(['firstName', 'email']));
 
 //   //---POST---[ACTION]---
@@ -119,19 +120,11 @@ app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false })
 
 
 //   //---PUT---[USER]---
-//   //TODO: This is where I need to edit the PUT secitons 
-//   //FIXME: this is not done yet 
-//   app.put('/', passport.authenticate('bearer', { sesison: false }),
-//     (req, res) => res.json(['firstName', 'email']));
 
 //   //---PUT---[QUESTIONS]---
 
 
 //   //---DELETE---[REMOVE USER]---
-//   //TODO: This is where I need to have the delete section 
-//   //FIXME: this is not done yet 
-//   app.delete('', passport.authenticate('bearer', { sesison: false }),
-//     (req, res) => res.json(['firstName', 'email']));
 
 //   //---DELETE---[REMOVE ACCESSTOKEN/REFRESHTOKEN]---
 
