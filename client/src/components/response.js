@@ -7,7 +7,7 @@ export default class Response extends React.Component {
        <div className='response'>
           <form>
             <input type="text" autocomplete='on' id="response"></input>
-            <button type='submit'/>
+            <button type='submit'>submit response </button>
           </form>
         </div>
     )
