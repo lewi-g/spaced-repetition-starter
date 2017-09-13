@@ -1,12 +1,8 @@
 import React from 'react';
 import * as Cookies from 'js-cookie';
 
-import Header from './header';
-import LoginPage from './login-page';
-import NavBar from './navbar';
 import QuestionPage from './question-page';
-
-
+import LoginPage from './login-page';
 
 class App extends React.Component {
 	constructor(props) {
@@ -45,22 +41,10 @@ class App extends React.Component {
 
 	render() {
 		if (!this.state.currentUser) {
-			return (
-				<div>
-					<Header />
-					<LoginPage />
-				</div>
-			);
+			return <LoginPage />;
 		}
-		return (
-		<div>
-			<Header />
-			<NavBar />
-			<QuestionPage />
-		</div>
-		);
+		return <QuestionPage />;
 	}
 }
-
 
 export default App;
