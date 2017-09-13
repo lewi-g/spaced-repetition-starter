@@ -20,4 +20,9 @@ userSchema.methods.apiRepr = function() {
 
 const User = mongoose.model('User', userSchema);
 
+//create a question model
+//get an endpoint to return the first question
+
+//get displaying in frontend
+
 module.exports = User;

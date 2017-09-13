@@ -90,7 +90,7 @@ app.get('/api/me',
 //algorithm would live in .GET
 app.get('/api/questions',
   passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token      -- database of questions // going to have to access the database 
-  (req, res) => res.json(['Question 1', 'Question 2'])
+  (req, res) => res.json(['Question 1', 'Question 2']) //starterQuestions.js
 );
 
 app.post('api/questions');
