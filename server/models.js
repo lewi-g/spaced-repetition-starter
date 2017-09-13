@@ -33,9 +33,6 @@ const Prompts = mongoose.model('Prompts', promptSchema);
 
 module.exports = {User, Prompts};
 
-//create a question model
-
-//get an endpoint to return the first question
 
 //get database pulling info
 
