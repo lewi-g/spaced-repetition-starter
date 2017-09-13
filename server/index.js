@@ -6,8 +6,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const BearerStrategy = require('passport-http-bearer').Strategy;
 const mongoose = require('mongoose');
 
-const User = require('./models.js');
-const Prompts = require('./models.js');
+const {User, Prompts} = require('./models.js');
 const { PORT, DATABASE_URL } = require('./config.js');
 
 let secret = {
@@ -98,7 +97,9 @@ app.get('/api/questions',
       .find()
       .exec()
       .then(prompt =>{
+        console.log('PROMPT: ', prompt);
         res.json(prompt);
+        console.log('Prompt roundd 2: ', prompt);
       })
       .catch(err => {
         console.error(err);
