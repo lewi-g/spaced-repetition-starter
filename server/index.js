@@ -63,8 +63,7 @@ passport.use(
 app.get('/api/auth/google',
   passport.authenticate('google', { scope: ['profile'] }));
 
-app.get(
-  '/api/auth/google/callback',
+app.get('/api/auth/google/callback',
   passport.authenticate('google', {
     failureRedirect: '/',
     session: false
@@ -77,13 +76,11 @@ app.get(
 
 app.get('/api/auth/logout', (req, res) => {
   req.logout();
-  res.clearCookie('accessToken');
+  res.clearCookie('accessToken');    //add an anchor tag for this URL or event listener one a button
   res.redirect('/');
 });
 
-app.get('/qustions');
 
-app.post('/questionsadd');
 app.get('/api/me',
   passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token -- GET & POST
   (req, res) => res.json({                              //Get can pull LOTS of questions and run the algorithms, push large group to backen
@@ -92,13 +89,16 @@ app.get('/api/me',
 );
 //algorithm would live in .GET
 app.get('/api/questions',
-  passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token 
+  passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token      -- database of questions // going to have to access the database 
   (req, res) => res.json(['Question 1', 'Question 2'])
 );
 
+app.post('api/questions');
+
 // //---POST---[ADDING USER]---
 
-app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false }),
+app.post('/api/auth/google', 
+passport.authenticate('bearer', { sesison: false }),
   (req, res) => res.json(['firstName', 'email']));
 
 //   //---POST---[ACTION]---
