@@ -1,7 +1,5 @@
-//need to connect server.js to this 
-//needt to export NOTES
 
-
+'use strict';
 const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
@@ -15,9 +13,29 @@ userSchema.methods.apiRepr = function() {
     googleId: this.googleId, //may need profile.id
     // definition: this.defintion
   };
-}; 
+};
+
+const promptSchema = mongoose.Schema({
+  prompt: {type: String, required: true},
+  response: {} 
+});
+
+promptSchema.method.apiRepr = function () {
+  return {
+    prompt: this.prompt,
+    response: this.response
+  };
+};
 
 
 const User = mongoose.model('User', userSchema);
+const Prompts = mongoose.model('Prompts', promptSchema);
 
-module.exports = User;
+module.exports = {User, Prompts};
+
+
+//get database pulling info
+
+//get displaying in frontend
+
+//Lewi is getting the components together -- Header / login button / whats is our app about 

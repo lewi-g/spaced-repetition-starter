@@ -6,7 +6,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const BearerStrategy = require('passport-http-bearer').Strategy;
 const mongoose = require('mongoose');
 
-const User = require('./models.js');
+const {User, Prompts} = require('./models.js');
 const { PORT, DATABASE_URL } = require('./config.js');
 
 let secret = {
@@ -81,8 +81,6 @@ app.get('/api/auth/logout', (req, res) => {
   res.redirect('/');
 });
 
-app.get('/qustions');
-
 app.post('/questionsadd');
 app.get('/api/me',
   passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token -- GET & POST
@@ -90,13 +88,25 @@ app.get('/api/me',
     googleId: req.user.googleId                         //OR
   })                                                    // Get will pull one question at at time (easier) / have algorithm on the back
 );
+
 //algorithm would live in .GET
 app.get('/api/questions',
   passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token 
-  (req, res) => res.json(['Question 1', 'Question 2'])
-);
+  (req, res) => {
+    Prompts
+      .find()
+      .exec()
+      .then(prompt =>{
+        console.log('PROMPT: ', prompt);
+        res.json(prompt);
+        console.log('Prompt roundd 2: ', prompt);
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json({ error: 'something went terribly wrong' });
+      });
+  });
 
-// //---POST---[ADDING USER]---
 
 app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false }),
   (req, res) => res.json(['firstName', 'email']));
@@ -118,9 +128,6 @@ app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false })
 //   //---DELETE---[REMOVE ACCESSTOKEN/REFRESHTOKEN]---
 
 
-
-
-
 // Serve the built client
 app.use(express.static(path.resolve(__dirname, '../client/build')));
 
@@ -132,6 +139,20 @@ app.get(/^(?!\/api(\/|$))/, (req, res) => {
 });
 
 let server;
+// function runServer() {
+//     let databaseUri = 'mongodb:/space_dev:1@ds133094.mlab.com:33094/google_auth';
+//     mongoose.Promise = global.Promise;
+//     mongoose.connect(databaseUri).then(function() {
+//      app.listen(3001, HOST, (err) => {
+//         if (err) {
+//             console.error(err);
+//             return(err);
+//         }
+//         const host = HOST || 'localhost';
+//         console.log(`Listening on ${host}:3001`);
+//     });
+//  });
+// }
 function runServer(databaseUrl = 'mongodb://space_dev:1@ds133094.mlab.com:33094/google_auth', port = 3001) {
   return new Promise((resolve, reject) => {
     mongoose.connect(databaseUrl, err => {
