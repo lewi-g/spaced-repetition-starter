@@ -107,6 +107,8 @@ app.get('/api/questions',
       });
   });
 
+// app.post('/api/questions', (req, res, next)
+// required fields
 
 app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false }),
   (req, res) => res.json(['firstName', 'email']));

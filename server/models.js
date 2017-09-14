@@ -34,8 +34,12 @@ const Prompts = mongoose.model('Prompts', promptSchema);
 module.exports = {User, Prompts};
 
 
-//get database pulling info
-
 //get displaying in frontend
 
 //Lewi is getting the components together -- Header / login button / whats is our app about 
+
+//Redux
+
+//ike the algorithm
+
+//or figuring out how to get more q;s to the DOM
