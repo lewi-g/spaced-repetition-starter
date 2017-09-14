@@ -141,20 +141,6 @@ app.get(/^(?!\/api(\/|$))/, (req, res) => {
 });
 
 let server;
-// function runServer() {
-//     let databaseUri = 'mongodb:/space_dev:1@ds133094.mlab.com:33094/google_auth';
-//     mongoose.Promise = global.Promise;
-//     mongoose.connect(databaseUri).then(function() {
-//      app.listen(3001, HOST, (err) => {
-//         if (err) {
-//             console.error(err);
-//             return(err);
-//         }
-//         const host = HOST || 'localhost';
-//         console.log(`Listening on ${host}:3001`);
-//     });
-//  });
-// }
 function runServer(databaseUrl = 'mongodb://space_dev:1@ds133094.mlab.com:33094/google_auth', port = 3001) {
   return new Promise((resolve, reject) => {
     mongoose.connect(databaseUrl, err => {

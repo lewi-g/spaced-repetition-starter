@@ -1,0 +1,78 @@
+[
+  {
+  "prompt":"The element with Atomic number 1",
+  "response": ["Hydrogen","H","hydrogen"]
+  },
+  {
+    "prompt": "the element with Atomic number 2 is ",
+    "response": ["Helium", "He", "helium"]
+  },
+  {
+    "prompt":"Lithium is a metal. How many protons does it have?",
+    "response": ["three", "3"]
+  },
+  {
+    "prompt": "Atoms have particles that have a positive charge. This particle is called ",
+    "response": "proton"
+  },
+  {
+    "prompt": "Water is made of two Hydrogen atoms and one ______ atom",
+    "response":["Oxygen","O","oxygen"]
+  },
+  {
+    "prompt": "Elctrons in the outer-most shell of an atom are referred to as ",
+    "response": "valence electrons"
+  },
+    {
+    "prompt": "Chemical elements are arranged by their atomic number, electronic configurations and recurring chemical properties in a table called ",
+    "response": "periodic table"
+  },
+    {
+    "prompt": "The energy it takes to remove one electron from an atom is known as ",
+    "response": "Ionization energy"
+  },
+    {
+    "prompt": "The tendencey of an atom to attract electrons is known as ",
+    "response": "electronegativity"
+  },
+    {
+    "prompt": "The amount of energy released when an electron is added to a neutral atom to forrm a negative ion is called ",
+    "response": "elctron affinity"
+  },
+  {
+    "prompt":"",
+    "response":""
+  },
+  {
+    "prompt":"",
+    "response":""
+  },
+  {
+    "prompt":"",
+    "response":""
+  },
+  {
+    "prompt":"",
+    "response":""
+  },
+  {
+    "prompt":"",
+    "response":""
+  },
+  {
+    "prompt":"",
+    "response":""
+  },
+  {
+    "prompt":"",
+    "response":""
+  },
+  {
+    "prompt":"",
+    "response":""
+  },
+  {
+    "prompt":"",
+    "response":""
+  }
+]

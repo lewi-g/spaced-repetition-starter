@@ -1,8 +1,12 @@
 import React from 'react';
 import * as Cookies from 'js-cookie';
 
-import QuestionPage from './question-page';
+import Header from './header';
 import LoginPage from './login-page';
+import NavBar from './navbar';
+import QuestionPage from './question-page';
+
+
 
 class App extends React.Component {
 	constructor(props) {
@@ -20,7 +24,7 @@ class App extends React.Component {
 						headers: {
 							'Authorization': `Bearer ${accessToken}`
 						}
-				}).then(res => {
+					}).then(res => {
 					if (!res.ok) {
 						if (res.status === 401) {
 							// Unauthorized, clear the cookie and go to
@@ -29,7 +33,7 @@ class App extends React.Component {
 							return;
 						}
 						throw new Error(res.statusText);
-				}
+					}
 					return res.json();
 			}).then(currentUser =>
 					this.setState({
@@ -41,10 +45,22 @@ class App extends React.Component {
 
 	render() {
 		if (!this.state.currentUser) {
-			return <LoginPage />;
+			return (
+				<div>
+					<Header />
+					<LoginPage />
+				</div>
+			);
 		}
-		return <QuestionPage />;
+		return (
+		<div>
+			<Header />
+			<NavBar />
+			<QuestionPage />
+		</div>
+		);
 	}
 }
+
 
 export default App;
