@@ -3,7 +3,6 @@ import * as actions from './actions';
 const initialState = {
   question: '',
   name: '',
-  picture: '',
   score: 0,
   negScore: 0,
   error: null, 
@@ -16,7 +15,6 @@ export default (state=initialState, action) => {
   if (action.type === actions.FETCH_USER_SUCCESS) {
     return{...state,
     name: action.name,
-    picture: action.picture,
     error: null, 
     }
   }
@@ -44,16 +42,16 @@ export default (state=initialState, action) => {
         answer: action.answer.actualAnswer,
         answered: true
       }
+    }
       else {
-        return {...state,
+      return {...state,
           correct: action.asnwer.correct,
           negScore: state.negScore+1,
           answer: action.answer.actualAnswer, 
           answered: true
         }
       }
-    }   
-  }
+  }   
   if (action.type === actions.SUBMIT_ANSWER_FAILURE) {
     return{...state, 
       error: action.error
