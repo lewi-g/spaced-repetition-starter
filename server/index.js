@@ -2,11 +2,12 @@
 const path = require('path');
 const express = require('express');
 const passport = require('passport');
+const bodyParser = require('body-parser');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const BearerStrategy = require('passport-http-bearer').Strategy;
 const mongoose = require('mongoose');
 
-const {User, Prompts} = require('./models.js');
+const { User, Prompts } = require('./models.js');
 const { PORT, DATABASE_URL } = require('./config.js');
 
 let secret = {
@@ -21,6 +22,7 @@ if (process.env.NODE_ENV != 'production') {
 const app = express();
 
 app.use(passport.initialize());
+app.use(bodyParser.json());
 
 passport.use(
   new GoogleStrategy({
@@ -29,17 +31,20 @@ passport.use(
     callbackURL: '/api/auth/google/callback'
   },
   (accessToken, refreshToken, profile, cb) => {
-    User.findOne({ googleId: profile.id })
+    User
+      .findOne({ googleId: profile.id })
       .exec()
       .then(_user => {
-        console.log('look here: ', _user);
+        // console.log('look here: ', _user);
         if (!_user) {
-          User.create({
-            googleId: profile.id,
-            accessToken: accessToken
-          }, (err, _user) => {
-            return cb(err, _user);
-          });
+          User
+            .create({
+              displayName: profile.displayName,
+              googleId: profile.id,
+              accessToken: accessToken
+            }, (err, _user) => {
+              return cb(err, _user);
+            });
           return cb(null, false, { message: 'User already exists' });
         }
         return cb(null, _user);
@@ -50,13 +55,16 @@ passport.use(
 passport.use(
   new BearerStrategy(
     (accessToken, done) => {
-      User.findOne({ accessToken }, function (err, user) {
-        if (err) { return done(err); }
-        if (!(user)) {
-          return done(null, false);
-        }
-        return done(null, user);
-      });
+      User
+        .findOne({ accessToken }, function (err, user) {
+          if (err) {
+            return done(err);
+          }
+          if (!(user)) {
+            return done(null, false);
+          }
+          return done(null, user);
+        });
     })
 );
 
@@ -81,7 +89,6 @@ app.get('/api/auth/logout', (req, res) => {
   res.redirect('/');
 });
 
-app.post('/questionsadd');
 app.get('/api/me',
   passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token -- GET & POST
   (req, res) => res.json({                              //Get can pull LOTS of questions and run the algorithms, push large group to backen
@@ -91,15 +98,14 @@ app.get('/api/me',
 
 //algorithm would live in .GET
 app.get('/api/questions',
-  passport.authenticate('bearer', { session: false }),  //Endpoints using the bearer token 
+  passport.authenticate('bearer', { session: false }), 
   (req, res) => {
     Prompts
       .find()
       .exec()
-      .then(prompt =>{
-        console.log('PROMPT: ', prompt);
+      .then(prompt => {
+        // console.log('PROMPT: ', prompt);
         res.json(prompt);
-        console.log('Prompt roundd 2: ', prompt);
       })
       .catch(err => {
         console.error(err);
@@ -107,27 +113,133 @@ app.get('/api/questions',
       });
   });
 
-// app.post('/api/questions', (req, res, next)
-// required fields
+app.get('/api/questions', passport.authenticate('bearer', {session: false})),
+  (req, res) => {
+    User
+      .find({googleId: req.user.googleId})
+      .exec()
+      .then(user => {
+        let currentQuestion = {};
+        res.status(200).json(req.Prompts);
+        console.log('Prompt: ', Prompts);
+      });
+  };
+//   //---Algorithm---[ACTION]---
 
-app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false }),
-  (req, res) => res.json(['firstName', 'email']));
+//debug 
+/**
+ * get one question to show on the frontend at a time (grabbing 0 index) Prompts[0]/ finding a new question
+ * If / Else -- correct or incorrect (where to place the 0 index)
+ * correct -- back
+ * incorrect -- swap 
+ * 
+ * for ( let i = 0) {
+ * 
+ * if ( answer === currentQuestionMap.response[i] )
+ * 
+ * }
+ * 
+ * if ( 
+ *  ( answer === currentQuestionMap.response[0] ) || 
+ *  ( answer === currentQuestionMap.response[1] )
+ * ) {
+ * 
+ * }
+ * 
+ * for loop if there are 4 answers "responses "
+ */
+//array.push(array.shift()) -- shift to the back 
+//array.splice(1, 0, array.pop())-- swap
 
-//   //---POST---[ACTION]---
+//============================================================================
+// const currentQuestionMap = {}
 
+// app.get('/api/question',
+//   passport.authenticate('bearer', {session: false}),
+//   (req, res) => {
+//     User
+//     .findOne({ googleId: req.user.googleId })
+//     .exec()
+//     .then(user => {
+//       let currentQuestion = {};
+//       if (currentQuestionMap.hasOwnProperty(req.user.googleId)){
+//         currentQuestion = user.apiRepr(currentQuestionMap[Prompts[0].prompt); //chemical element name
+//       }
+//       else{
+//         currentQuestion = user.apiRepr('Non-existent Element');
+//       }
+//       currentQuestionMap[req.user[0].googleId] = currentQuestion;
+//       res.json({letters: currentQuestion.letters, atomic: currentQuestion.atomic});
+//     })
+//     .catch(console.error)
+// })
 
-//   //---POST---[ACTION]---
+// app.put('/api/answer',
+//   passport.authenticate('bearer', {session: false}),
+//   (req, res) => {
+//     const currentQuestion = currentQuestionMap[req.user[0].googleId];
+//     if (req.body.answer.toLowerCase() === currentQuestion.name.toLowerCase()){
+//       const search = {googleId: req.user[0].googleId, "questions.questionId": currentQuestion.questionId}
+//       User
+//       .findOneAndUpdate(search, {$mul: {"questions.$.mValue" : 2}}, {new: true})
+//       .exec()
+//       .then(user => {
+//         res.json({correct: true, actualAnswer: currentQuestion.name});
+//       })
+//       .catch(console.error)
+//     }
+//     else {
+//       const search = {googleId: req.user[0].googleId, "questions.questionId": currentQuestion.questionId}
+//       User
+//       .findOneAndUpdate(search, {$set: {"questions.$.mValue" : 1}}, {new: true})
+//       .exec()
+//       .then(user => {
+//         res.json({correct: false, actualAnswer: currentQuestion.name});
+//       })
+//       .catch(console.error)
+//     }
+// })
+//================================================================
+// 
+// app.post('/api/auth/google', passport.authenticate('bearer', { sesison: false }),
+  // (req, res) => res.json(['firstName', 'email']));
 
+// app.get('/api/user', (req, res) => {
+//   User
+//     .find()
+//     .exec()
+//     .then(_user => res.json(_user)
+//       .catch(console.error)
+//     );}
+// );
 
+// app.get('/api/user/:accessToken', (req, res) => {
+//   User
+//     .findOne()
+//     .exec()
+//     .then(data => res.json(data)
+//       .catch(console.error)
+//     );}
+// );
 
-//   //---PUT---[USER]---
+// app.post('/api/user', (req, res) => {
+//   console.log('THIS IS THE REQ BODY ----->: ',req.body);
+//   User
+//     .create({
+//       displayName: req.body.displayName,
+//       googleId: req.body.googleId,
+//       accessToken: req.body.accessToken
+//     })
+//     .then(newUser => {
+//       console.log('WHAT IS IN NEWUSER------>: ', newUser);
+//       res.status(201).json(newUser);
+//     })
+//     .catch(err => {
+//       console.log(err);
+//       res.status(500).json({message: 'internal server error'});
+//     });
+// });
 
-//   //---PUT---[QUESTIONS]---
-
-
-//   //---DELETE---[REMOVE USER]---
-
-//   //---DELETE---[REMOVE ACCESSTOKEN/REFRESHTOKEN]---
 
 
 // Serve the built client
