@@ -108,13 +108,23 @@ app.get('/api/questions',
       .then(prompt =>{
         // console.log('PROMPT: ', prompt[0]);
         //prompt.map(item => {
-          //console.log('ITEM',item);
-          for(let i=0;i<prompt.length; i++){
-              return res.status(200).json(prompt[i]);
-          }
-        })
-        // res.json(prompt.map());
-      // })
+        //console.log('ITEM',item);
+        for(let i=0;i<prompt.length; i++){
+          return res.status(200).json(prompt[i]);
+        }
+      })
+      .then(prompt[i] => {
+        if (answer === prompt[i].response.toLowerCase()) {
+            prompt[i].push(array.shift());
+        }
+        else {
+          prompt[i].splice(1, 0, array.pop());
+
+        }
+    //   })
+      })
+    // // res.json(prompt.map());
+    //   // })
       .catch(err => {
         console.error(err);
         res.status(500).json({ error: 'something went terribly wrong' });
