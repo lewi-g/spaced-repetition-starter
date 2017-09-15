@@ -5,6 +5,7 @@ import App from './components/app';
 import './index.css';
 import './login.css';
 import './words.css';
+import store from './store';
 
 ReactDOM.render(
   <Provider store={store}>
@@ -12,6 +13,8 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('root')
 );
+
+
 
 
 
