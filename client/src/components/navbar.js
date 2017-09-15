@@ -1,14 +1,19 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-export default class NavBar extends React.Component {
+const mapStateToProps = (state, props) => ({
+    name: state.name,
+})
+
+export class NavBar extends React.Component {
   render () {
     return (
-      <nav>
-        <ul>
-         <li> UserName from user.id or something </li>
-         <li> <a href={'/api/auth/logout'}>LogOut</a> </li>
-        </ul>
+      <nav >
+        <h2 className="userInfo">{this.props.name}</h2>
+        <button className="logout"> <a href={'/api/auth/logout'}>LogOut</a> </button>
       </nav>
     )
   }
 }
+
+export default connect(mapStateToProps)(NavBar);

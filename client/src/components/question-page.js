@@ -1,40 +1,38 @@
 import React from 'react';
 import * as Cookies from 'js-cookie';
+import * as actions from '../actions';
 
+import { connect } from 'react-redux';
+import Header from './header';
 import Response from './response';
 
-export default class QuestionPage extends React.Component {
+
+const mapStateToProps = (state, props) => ({
+    question: state.question,
+    name: state.name,
+    picture: state.picture,
+    correct: state.correct,
+    answer: state.answer,
+    answered: state.answered,
+    score: state.score,
+    negScore: state.negScore,
+})
+
+export class QuestionPage extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      questions: []
-    };
+    // this.state = {
+    //   questions: []
+    // };
   }
 
   componentDidMount() {
-    const accessToken = Cookies.get('accessToken');
-    fetch('/api/questions', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(res.statusText);
-        }
-        return res.json();
-      })
-      .then(questions =>
-        this.setState({
-          questions
-        })
-      );
+        this.props.dispatch(actions.fetchUser());
+        this.props.dispatch(actions.fetchQuestion());
   }
 
   render() {
-    const questions = this.state.questions.map((question, index) => (
-      <li key={index}>{question}</li>
-    ));
+    const questions = <li>{this.props.question.prompt}</li>
     return (
       <div>
         <section className='test'>
@@ -48,3 +46,6 @@ export default class QuestionPage extends React.Component {
     ) ;
   }
 }
+
+
+export default connect(mapStateToProps)(QuestionPage);

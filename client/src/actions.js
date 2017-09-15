@@ -1,5 +1,6 @@
 import * as Cookies from 'js-cookie';
-import {browserHistory} from 'react-router';
+// import {browserHistory} from 'react-router'; // change to broserRouter?
+// import {browserRouter} from 'react-router';
 
 export const FETCH_USER_SUCCESS = 'FETCH_USER_SUCCESS';
 export const fetchUserSuccess = user => ({
@@ -47,39 +48,40 @@ export const fetchUser = () => dispatch => {
     }).then(res => {
         if (!res.ok) {
             Cookies.remove('accessToken');
-            browserHistory.replace('/login'); // what does this do?
             throw new Error(res.statusText);
         }
+        else {
         return res.json();
+        }
     })
     .then(user => {
         dispatch(fetchUserSuccess(user));
     })
     .catch(err => {
-        dispatch(fetchUserFailure(error));
+        dispatch(fetchUserFailure(err));
     })
 }
 
 export const fetchQuestion = () => dispatch => {
   const accessToken = Cookies.get('accessToken');
-  return fetch('/api/question', {
+  return fetch('/api/questions', {
     headers: {
       Authorization: `Bearer ${accessToken}`
     }
   })
   .then(res => {
     if (!res.ok) {
-      Cookies.remove('accessToken');
-      browserHistory.replace('./login');
       throw new Error(res.statusText);
     }
+    else{
     return res.json();
+    }
   })
   .then(question => {
     dispatch(fetchQuestionSuccess(question));
   })
   .catch(err => {
-    dispatch(fetchQuestionFailure(error));
+    dispatch(fetchQuestionFailure(err));
   })
 }
 

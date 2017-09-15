@@ -96,9 +96,9 @@ app.get('/api/questions',
       .find()
       .exec()
       .then(prompt =>{
-        console.log('PROMPT: ', prompt);
-        res.json(prompt);
-        console.log('Prompt roundd 2: ', prompt);
+        console.log('PROMPT: ', prompt[0]);
+        res.json(prompt[0]);
+        // console.log('Prompt roundd 2: ', prompt);
       })
       .catch(err => {
         console.error(err);
@@ -106,10 +106,20 @@ app.get('/api/questions',
       });
   });
 
+// Post endpoint for user responses
+app.post('/api/questions/next', 
+  passport.authenticate('bearer', { sesison: false }),
+  (req, res) => {
+    console.log('we reached the post endpoint');
+    res.json(['firstName', 'email']);
+
+  }
+);
+
 // //---POST---[ADDING USER]---
 
 app.post('/api/auth/google', 
-passport.authenticate('bearer', { sesison: false }),
+  passport.authenticate('bearer', { sesison: false }),
   (req, res) => res.json(['firstName', 'email']));
 
 //   //---POST---[ACTION]---
