@@ -3,6 +3,7 @@ const path = require('path');
 const express = require('express');
 const passport = require('passport');
 const bodyParser = require('body-parser');
+const { LinkedList, printList, display } = require('./list');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const BearerStrategy = require('passport-http-bearer').Strategy;
 const mongoose = require('mongoose');
@@ -21,8 +22,9 @@ if (process.env.NODE_ENV != 'production') {
 
 const app = express();
 
+const jsonParser = bodyParser.json()
 app.use(passport.initialize());
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
 
 passport.use(
   new GoogleStrategy({
@@ -97,33 +99,112 @@ app.get('/api/me',
 );
 
 //algorithm would live in .GET
-app.get('/api/questions',
-  passport.authenticate('bearer', { session: false }), 
-  (req, res) => {
-    Prompts
-      .find()
-      .exec()
-      .then(prompt => {
-        // console.log('PROMPT: ', prompt);
-        res.json(prompt);
-      })
-      .catch(err => {
-        console.error(err);
-        res.status(500).json({ error: 'something went terribly wrong' });
-      });
-  });
+// app.get('/api/questions',
+//   passport.authenticate('bearer', { session: false }), 
+//   (req, res) => {
+//     Prompts
+//       .find()
+//       .exec()
+//       .then(prompt => {
+//         // console.log('PROMPT: ', prompt);
+//         res.json(prompt);
+//       })
+//       .catch(err => {
+//         console.error(err);
+//         res.status(500).json({ error: 'something went terribly wrong' });
+//       });
+//   });
 
-app.get('/api/questions', passport.authenticate('bearer', {session: false})),
-  (req, res) => {
-    User
-      .find({googleId: req.user.googleId})
-      .exec()
-      .then(user => {
-        let currentQuestion = {};
-        res.status(200).json(req.Prompts);
-        console.log('Prompt: ', Prompts);
-      });
-  };
+let questionList;
+app.get(
+    '/api/questions',
+    passport.authenticate('bearer', { session: false }),
+    (req, res) => {
+        User
+          .find({ googleId: req.user.googleId })
+          .then(user => {
+                console.log(user);
+                console.log(user[0].prompts);
+                return user[0].prompts;
+            })
+            .then(prompts => {
+              console.log('WHATS THIS', prompts);
+                if (prompts.length === 0) {
+                    return Prompts.find()
+                        .then(list => {
+                          console.log(list[0]);
+                            return list[0].questionsData;
+                        })
+                        .then(questionArray => {
+                            return User.findOneAndUpdate(
+                                { googleId: req.user.googleId },
+                                { prompts: questionArray },
+                                { new: true }
+                            );
+                        });
+                } else {
+                    return User.find({ googleId: req.user.googleId });
+                }
+            })
+            .then(result => {
+                const questionsArray = result[0].prompts;
+                return questionsArray;
+            })
+            .then(questionsArray => {
+                questionList = new LinkedList();
+
+                for (let i = 0; i < questionsArray.length; i++) {
+                    //inserts from res to linked list
+                    questionList.insert(i, questionsArray[i]);
+                }
+
+                //check to see what is currentQuestion and display it
+                if (questionList.get().currentQuestion === true) {
+                    res.json(questionList.get());
+                }
+
+                //what works:
+                //going into redux state
+                //rendered correctly
+                //new properties of correctAnswer: null and currentQuestion are going into state
+                //front end correct answer works
+
+                //what next:
+                //make a new question get or put
+                //in the dispatch we want to send whetehr this answer was correct or not
+                //want server to receive and move positions based off correctness
+                //want server to call next question and rerender
+                //front end next question rendering
+
+                // console.log(questionList.get(), 'THIS DISPLAYS OUR QUESTION LIST ITEM')
+            })
+            .catch(err => console.error(err));
+    }
+);
+
+app.put('/api/questions/update', jsonParser, (req, res) => {
+    if (req.body.correctAnswer) {
+        questionList.insert(12, req.body);
+        questionList.remove(0);
+    } else {
+        questionList.insert(2, req.body);
+        questionList.remove(0);
+    }
+    res.json(questionList.get(0));
+});
+
+
+// app.get('/api/questions', passport.authenticate('bearer', {session: false})),
+//   (req, res) => {res.send(req.body)};
+//     // User
+//     //   .find({googleId: req.user.googleId})
+//     //   .exec()
+//     //   .then(user => {
+//     //     let currentQuestion = {};
+//     //     res.status(200).json(req.Prompts);
+//         console.log('Look at this Prompt: ', );
+//   //     });
+  // };
 //   //---Algorithm---[ACTION]---
 
 //debug 
