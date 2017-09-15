@@ -87,9 +87,15 @@ export const fetchQuestion = () => dispatch => {
 
 
 export const submitAnswer = answer => dispatch => {
+  // const accessToken = Cookies.get('accessToken');
+  // return fetch('/api/questions', {
+  //   headers: {
+  //     Authorization: `Bearer ${accessToken}`
+  //   }
+  // })
   const accessToken = Cookies.get('accessToken');
    let init = {
-     method: 'PUT',
+     method: 'GET',
      headers: {
        Accept: 'application/json',
        'Content-Type': 'application/json',
@@ -97,7 +103,7 @@ export const submitAnswer = answer => dispatch => {
      },
      body: JSON.stringify(answer)
    };
-   return fetch(`api/answer`, init)
+   return fetch(`api/questions`, init)
   .then((res) => {
      if (res.status < 200 || res.status >= 300) {
        let error = new Error(res.statusText);
