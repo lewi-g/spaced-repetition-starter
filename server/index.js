@@ -96,10 +96,15 @@ app.get('/api/questions',
       .find()
       .exec()
       .then(prompt =>{
-        console.log('PROMPT: ', prompt[0]);
-        res.json(prompt[0]);
-        // console.log('Prompt roundd 2: ', prompt);
-      })
+        // console.log('PROMPT: ', prompt[0]);
+        //prompt.map(item => {
+          //console.log('ITEM',item);
+          for(let i=0;i<prompt.length; i++){
+              return res.status(200).json(prompt[i]);
+          }
+        })
+        // res.json(prompt.map());
+      // })
       .catch(err => {
         console.error(err);
         res.status(500).json({ error: 'something went terribly wrong' });
